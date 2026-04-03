@@ -6,4 +6,7 @@
     <string name="text_activity_note_details">EDIT NOTE:</string>
     <string name="text_dark_mode">Dark Mode</string>
     <string name="add_new_note_description">Add new note</string>
+
+    <string name="note_detail_text_title">Title</string>
+    <string name="note_detail_text_description">Start typing your note...</string>
 </resources>
