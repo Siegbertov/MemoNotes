@@ -20,6 +20,16 @@
         app:layout_constraintTop_toTopOf="parent"
         />
 
+    <View
+        android:id="@+id/line1"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="8dp"
+        android:background="?attr/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_settings_title" />
+
     <TextView
         android:id="@+id/tv_dark_theme"
         android:layout_width="wrap_content"
@@ -30,7 +40,7 @@
         android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_settings_title"
+        app:layout_constraintTop_toBottomOf="@id/line1"
         />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -44,13 +54,6 @@
         app:layout_constraintTop_toTopOf="@id/tv_dark_theme"
         />
 
-    <View
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/switch_dark_theme"
-        />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,5 +1,6 @@
 package com.s1g1.memonotes
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -16,6 +17,8 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
 
         binding.fabAddNote.setOnClickListener {
             Toast.makeText(requireContext(), "CLICKED ON ADD FAB", Toast.LENGTH_SHORT).show()
+            val intent = Intent(requireContext(), NoteDetailsActivity::class.java)
+            startActivity(intent)
         }
     }
 
