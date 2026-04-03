@@ -3,4 +3,5 @@
 
     <string name="text_dummy_fragment_notes">NOTES FRAGMENT</string>
     <string name="text_dummy_fragment_settings">SETTINGS FRAGMENT</string>
+    <string name="text_dark_mode">Dark Mode</string>
 </resources>
