@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.google.ksp)
 }
 
 android {
@@ -41,6 +42,24 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+
+    implementation(libs.kotlinx.coroutines.core) // COROUTINES
+    implementation(libs.kotlinx.coroutines.android) // COROUTINES
+
+    implementation(libs.androidx.lifecycle.viewmodel.ktx) // (viewModelScope)
+    implementation(libs.androidx.lifecycle.runtime.ktx) // (lifecycleScope)
+
+    implementation(libs.androidx.room.runtime) // ROOM (DATABASE)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    implementation(libs.androidx.fragment.ktx) // Fragment
+    implementation(libs.androidx.recyclerview) // RecycleView
+    implementation(libs.androidx.cardview) // CardView
+
+    implementation(libs.androidx.navigation.fragment.ktx)
+    implementation(libs.androidx.navigation.ui.ktx)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
