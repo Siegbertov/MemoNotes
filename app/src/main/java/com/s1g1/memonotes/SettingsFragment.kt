@@ -19,14 +19,10 @@ class SettingsFragment : Fragment(R.layout.fragment_settings){
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentSettingsBinding.bind(view)
 
-        // Subscribe for ViewModel
-        svm.isDarkMode.observe(viewLifecycleOwner) { isDark ->
-            binding.switchDarkTheme.isChecked = isDark
-        }
+        binding.switchDarkTheme.isChecked = svm.getSavedTheme()
 
         binding.switchDarkTheme.setOnCheckedChangeListener { _, isChecked ->
             svm.toggleDarkMode(isChecked)
-//            println("CURRENT: ${svm.isDarkMode.value}")
         }
     }
 
