@@ -9,6 +9,8 @@
 
     <string name="toolbar_title_new">New Note</string>
     <string name="toolbar_title_edit">Edit Note</string>
-    <string name="note_detail_text_title">Title</string>
-    <string name="note_detail_text_description">Start typing your note...</string>
+    <string name="text_title">Title</string>
+    <string name="text_timestamp">Timestamp</string>
+    <string name="text_description">Description</string>
+    <string name="text_description_hint">Start typing your note...</string>
 </resources>

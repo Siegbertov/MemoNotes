@@ -50,7 +50,7 @@ class NoteDetailsActivity : AppCompatActivity() {
         toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_save -> {
-                    val result = saveNote()
+                    val result = saveNote(noteId=noteId)
                     closeEditor(result)
                     true
                 }
@@ -73,13 +73,13 @@ class NoteDetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveNote() : Boolean {
+    private fun saveNote(noteId: Int = 0) : Boolean {
         val noteTitle = binding.etNoteTitle.text.toString()
-        val noteDT = binding.tvNoteDateTime.text.toString()
         val noteDescription = binding.etNoteDescription.text.toString()
 
         if (noteTitle.isNotBlank()){
             val newNote = NoteEntity(
+                id = noteId,
                 title = noteTitle,
                 description = noteDescription,
                 timestamp = noteTimestamp
