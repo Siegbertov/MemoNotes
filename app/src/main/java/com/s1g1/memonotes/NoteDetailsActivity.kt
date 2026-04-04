@@ -1,6 +1,8 @@
 package com.s1g1.memonotes
 
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -20,6 +22,7 @@ import kotlin.getValue
 class NoteDetailsActivity : AppCompatActivity() {
 
     private var noteTimestamp: Long = System.currentTimeMillis()
+    private var noteID: Int = -1
 
     private val noteViewModel: NoteViewModel by viewModels {
         NoteViewModelFactory((application as NoteApplication).repository)
@@ -28,9 +31,11 @@ class NoteDetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        noteID = intent.getIntExtra("NOTE_ID", -1)
 
         binding = ActivityNoteDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setSupportActionBar(binding.toolbarNoteDetails)
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -38,40 +43,33 @@ class NoteDetailsActivity : AppCompatActivity() {
             insets
         }
 
-        val noteId = intent.getIntExtra("NOTE_ID", -1)
-        setupNoteDetails(noteID = noteId)
-        setupToolbar(noteId=noteId)
+        setupNoteDetails()
 
     }
 
-    private fun setupToolbar(noteId: Int) {
-        val toolbar = binding.toolbarNoteDetails
-        toolbar.setNavigationOnClickListener {
-            closeEditor(true)
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.note_details_menu, menu)
+        if (noteID == -1) {
+            menu?.findItem(R.id.action_delete)?.isVisible = false
         }
+        return true
+    }
 
-        toolbar.inflateMenu(R.menu.note_details_menu)
-        if (noteId == -1) {
-            toolbar.menu.findItem(R.id.action_delete)?.isVisible = false
-        }
-        toolbar.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.action_save -> {
-                    val result = saveNote(noteId=noteId)
-                    closeEditor(result)
-                    true
-                }
-                R.id.action_delete -> {
-                    val result = removeNote(noteId=noteId)
-                    closeEditor(result)
-                    true
-                }
-                else -> false
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.action_save -> {
+                val result = saveNote()
+                closeEditor(result)
+            }
+            R.id.action_delete -> {
+                val result = removeNote()
+                closeEditor(result)
             }
         }
+        return super.onOptionsItemSelected(item)
     }
 
-    private fun setupNoteDetails(noteID: Int) {
+    private fun setupNoteDetails() {
         setCurrentDateTime()
         if (noteID != -1){
             lifecycleScope.launch(Dispatchers.IO) {
@@ -91,13 +89,13 @@ class NoteDetailsActivity : AppCompatActivity() {
         binding.tvNoteDateTime.text = formattedDate
     }
 
-    private fun saveNote(noteId: Int) : Boolean {
+    private fun saveNote() : Boolean {
         val noteTitle = binding.etNoteTitle.text.toString()
         val noteDescription = binding.etNoteDescription.text.toString()
 
         if (noteTitle.isNotBlank()){
             val newNote = NoteEntity(
-                id = if (noteId==-1) 0 else noteId,
+                id = if (noteID==-1) 0 else noteID,
                 title = noteTitle,
                 description = noteDescription,
                 timestamp = noteTimestamp
@@ -110,10 +108,10 @@ class NoteDetailsActivity : AppCompatActivity() {
         return false
     }
 
-    private fun removeNote(noteId: Int) : Boolean {
-        if (noteId != -1){
+    private fun removeNote() : Boolean {
+        if (noteID != -1){
             lifecycleScope.launch(Dispatchers.IO){
-                noteViewModel.deleteNoteById(id=noteId)
+                noteViewModel.deleteNoteById(id=noteID)
             }
             return true
         }
