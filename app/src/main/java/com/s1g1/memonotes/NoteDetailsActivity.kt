@@ -36,6 +36,7 @@ class NoteDetailsActivity : AppCompatActivity() {
         binding = ActivityNoteDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbarNoteDetails)
+        configureNavigation()
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -67,6 +68,12 @@ class NoteDetailsActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun configureNavigation() {
+        binding.toolbarNoteDetails.setNavigationOnClickListener {
+            closeEditor(true)
+        }
     }
 
     private fun setupNoteDetails() {
