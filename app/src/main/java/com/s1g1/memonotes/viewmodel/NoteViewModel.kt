@@ -31,6 +31,12 @@ class NoteViewModel(
         }
     }
 
+    fun deleteNoteById(id: Int){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.deleteNoteById(id=id)
+        }
+    }
+
 }
 
 

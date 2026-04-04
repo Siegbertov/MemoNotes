@@ -113,8 +113,7 @@ class NoteDetailsActivity : AppCompatActivity() {
     private fun removeNote(noteId: Int) : Boolean {
         if (noteId != -1){
             lifecycleScope.launch(Dispatchers.IO){
-                val noteToDelete = noteViewModel.getNoteById(id=noteId)
-                noteViewModel.delete(noteEntity = noteToDelete)
+                noteViewModel.deleteNoteById(id=noteId)
             }
             return true
         }
