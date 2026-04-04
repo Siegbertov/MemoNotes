@@ -7,6 +7,8 @@
     <string name="text_dark_mode">Dark Mode</string>
     <string name="add_new_note_description">Add new note</string>
 
+    <string name="toolbar_title_new">New Note</string>
+    <string name="toolbar_title_edit">Edit Note</string>
     <string name="note_detail_text_title">Title</string>
     <string name="note_detail_text_description">Start typing your note...</string>
 </resources>

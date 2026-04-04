@@ -1,16 +1,29 @@
 package com.s1g1.memonotes
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
+import com.s1g1.memonotes.database.NoteEntity
 import com.s1g1.memonotes.databinding.ActivityNoteDetailsBinding
+import com.s1g1.memonotes.viewmodel.NoteViewModel
+import com.s1g1.memonotes.viewmodel.NoteViewModelFactory
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.getValue
 
 class NoteDetailsActivity : AppCompatActivity() {
 
+    private var noteTimestamp: Long = System.currentTimeMillis()
+
+    private val noteViewModel: NoteViewModel by viewModels {
+        NoteViewModelFactory((application as NoteApplication).repository)
+    }
     private lateinit var binding: ActivityNoteDetailsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,17 +40,18 @@ class NoteDetailsActivity : AppCompatActivity() {
 
         val toolbar = binding.toolbarNoteDetails
         toolbar.setNavigationOnClickListener {
-            closeEditor()
+            closeEditor(true)
         }
 
-        setCurrentDateTime()
+        val noteId = intent.getIntExtra("NOTE_ID", -1)
+        setupNoteDetails(noteID = noteId)
 
         toolbar.inflateMenu(R.menu.note_details_menu)
         toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_save -> {
-                    saveNote()
-                    closeEditor()
+                    val result = saveNote()
+                    closeEditor(result)
                     true
                 }
                 else -> false
@@ -45,24 +59,49 @@ class NoteDetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveNote() {
-        val noteTitle = binding.etNoteTitle.text
-        val noteDT = binding.tvNoteDateTime.text
-        val noteDescription = binding.etNoteDescription.text
+    private fun setupNoteDetails(noteID: Int) {
+        setCurrentDateTime()
+        if (noteID != -1){
+            lifecycleScope.launch(Dispatchers.IO) {
+                val currentNote = noteViewModel.getNoteById(id = noteID)
+                binding.etNoteTitle.setText(currentNote.title)
+                binding.etNoteDescription.setText(currentNote.description)
+                binding.toolbarNoteDetails.title = getString(R.string.toolbar_title_edit)
+            }
+        } else {
+            binding.toolbarNoteDetails.title = getString(R.string.toolbar_title_new)
+        }
+    }
 
-        println("TITLE: $noteTitle")
-        println("DATETIME: $noteDT")
-        println("DESCRIPTION: $noteDescription")
+    private fun saveNote() : Boolean {
+        val noteTitle = binding.etNoteTitle.text.toString()
+        val noteDT = binding.tvNoteDateTime.text.toString()
+        val noteDescription = binding.etNoteDescription.text.toString()
+
+        if (noteTitle.isNotBlank()){
+            val newNote = NoteEntity(
+                title = noteTitle,
+                description = noteDescription,
+                timestamp = noteTimestamp
+            )
+            lifecycleScope.launch(Dispatchers.IO){
+                noteViewModel.upsert(noteEntity=newNote)
+            }
+            return true
+        }
+        return false
     }
 
     private fun setCurrentDateTime(){
-        val sdf = SimpleDateFormat("d MMM, HH:mm:s", Locale.getDefault())
-        val formattedDate = sdf.format(Date())
+        val sdf = SimpleDateFormat("d MMM, HH:mm:ss", Locale.getDefault())
+        val formattedDate = sdf.format(Date(noteTimestamp))
 
         binding.tvNoteDateTime.text = formattedDate
     }
 
-    private fun closeEditor() {
-        finish()
+    private fun closeEditor(shouldClose: Boolean) {
+        if (shouldClose){
+            finish()
+        }
     }
 }
