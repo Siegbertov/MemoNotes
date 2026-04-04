@@ -1,0 +1,20 @@
+package com.s1g1.memonotes.database
+
+import kotlinx.coroutines.flow.Flow
+
+class NoteRepository(private val noteDao: NoteEntityDao) {
+
+    val allNotes: Flow<List<NoteEntity>> = noteDao.getAllNotes()
+
+    suspend fun getNoteById(id: Int) : NoteEntity{
+        return noteDao.getNoteByID(id=id)
+    }
+
+    suspend fun upsert(noteEntity: NoteEntity){
+        noteDao.upsertNote(noteEntity=noteEntity)
+    }
+
+    suspend fun delete(noteEntity: NoteEntity){
+        noteDao.deleteNote(noteEntity=noteEntity)
+    }
+}
