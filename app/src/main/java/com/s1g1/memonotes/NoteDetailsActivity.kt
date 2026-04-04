@@ -5,8 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.s1g1.memonotes.databinding.ActivityNoteDetailsBinding
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class NoteDetailsActivity : AppCompatActivity() {
 
@@ -55,9 +56,9 @@ class NoteDetailsActivity : AppCompatActivity() {
     }
 
     private fun setCurrentDateTime(){
-        val currentDateTime = LocalDateTime.now()
-        val formatter = DateTimeFormatter.ofPattern("d MMM, HH:mm")
-        val formattedDate = currentDateTime.format(formatter)
+        val sdf = SimpleDateFormat("d MMM, HH:mm:s", Locale.getDefault())
+        val formattedDate = sdf.format(Date())
+
         binding.tvNoteDateTime.text = formattedDate
     }
 

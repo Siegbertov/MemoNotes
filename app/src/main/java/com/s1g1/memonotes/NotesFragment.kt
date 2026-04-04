@@ -16,7 +16,6 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
         _binding = FragmentNotesBinding.bind(view)
 
         binding.fabAddNote.setOnClickListener {
-            Toast.makeText(requireContext(), "CLICKED ON ADD FAB", Toast.LENGTH_SHORT).show()
             val intent = Intent(requireContext(), NoteDetailsActivity::class.java)
             startActivity(intent)
         }
