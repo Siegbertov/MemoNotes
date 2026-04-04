@@ -38,19 +38,31 @@ class NoteDetailsActivity : AppCompatActivity() {
             insets
         }
 
+        val noteId = intent.getIntExtra("NOTE_ID", -1)
+        setupNoteDetails(noteID = noteId)
+        setupToolbar(noteId=noteId)
+
+    }
+
+    private fun setupToolbar(noteId: Int) {
         val toolbar = binding.toolbarNoteDetails
         toolbar.setNavigationOnClickListener {
             closeEditor(true)
         }
 
-        val noteId = intent.getIntExtra("NOTE_ID", -1)
-        setupNoteDetails(noteID = noteId)
-
         toolbar.inflateMenu(R.menu.note_details_menu)
+        if (noteId == -1) {
+            toolbar.menu.findItem(R.id.action_delete)?.isVisible = false
+        }
         toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_save -> {
                     val result = saveNote(noteId=noteId)
+                    closeEditor(result)
+                    true
+                }
+                R.id.action_delete -> {
+                    val result = removeNote(noteId=noteId)
                     closeEditor(result)
                     true
                 }
@@ -73,13 +85,19 @@ class NoteDetailsActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveNote(noteId: Int = 0) : Boolean {
+    private fun setCurrentDateTime(){
+        val sdf = SimpleDateFormat("d MMM, HH:mm:ss", Locale.getDefault())
+        val formattedDate = sdf.format(Date(noteTimestamp))
+        binding.tvNoteDateTime.text = formattedDate
+    }
+
+    private fun saveNote(noteId: Int) : Boolean {
         val noteTitle = binding.etNoteTitle.text.toString()
         val noteDescription = binding.etNoteDescription.text.toString()
 
         if (noteTitle.isNotBlank()){
             val newNote = NoteEntity(
-                id = noteId,
+                id = if (noteId==-1) 0 else noteId,
                 title = noteTitle,
                 description = noteDescription,
                 timestamp = noteTimestamp
@@ -92,11 +110,15 @@ class NoteDetailsActivity : AppCompatActivity() {
         return false
     }
 
-    private fun setCurrentDateTime(){
-        val sdf = SimpleDateFormat("d MMM, HH:mm:ss", Locale.getDefault())
-        val formattedDate = sdf.format(Date(noteTimestamp))
-
-        binding.tvNoteDateTime.text = formattedDate
+    private fun removeNote(noteId: Int) : Boolean {
+        if (noteId != -1){
+            lifecycleScope.launch(Dispatchers.IO){
+                val noteToDelete = noteViewModel.getNoteById(id=noteId)
+                noteViewModel.delete(noteEntity = noteToDelete)
+            }
+            return true
+        }
+        return false
     }
 
     private fun closeEditor(shouldClose: Boolean) {
