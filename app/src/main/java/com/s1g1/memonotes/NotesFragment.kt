@@ -35,6 +35,7 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentNotesBinding.bind(view)
+        val toolbar = requireActivity().findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar_main)
 
         binding.fabAddNote.setOnClickListener {
             val intent = Intent(requireContext(), NoteDetailsActivity::class.java)
@@ -49,25 +50,40 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
                 // future EMPTY IMPLEMENTATION
                 println("THERE IS NO NOTE")
             } else {
-                // future LIST IMPLEMENTATION
-//                println("--- CURRENT NOTES ---")
-//                notes.forEach { note ->
-//                    println(note)
-//                }
-//                println("")
-
                 noteAdapter.submitList(notes)
+            }
+        }
+
+        toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.action_delete_selected -> {
+                    val selectedNotes = noteAdapter.selectedNotes.toList()
+                    if (selectedNotes.isNotEmpty()) {
+                        noteViewModel.deleteNotes(selectedNotes)
+                        noteAdapter.clearSelection() // Сбрасываем выбор в UI
+                    }
+                    true
+                }
+                else -> false
             }
         }
 
     }
 
     private fun setupRecyclerView() {
-        noteAdapter = NoteAdapter { note ->
-            val intent = Intent(requireContext(), NoteDetailsActivity::class.java)
-            intent.putExtra("NOTE_ID", note.id)
-            startActivity(intent)
-        }
+        val toolbar = requireActivity().findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar_main)
+        noteAdapter = NoteAdapter(
+            onNoteClick = { note ->
+                val intent = Intent(requireContext(), NoteDetailsActivity::class.java)
+                intent.putExtra("NOTE_ID", note.id)
+                startActivity(intent)
+            },
+            onSelectionChanged = {count ->
+                val deleteMenuItem = toolbar.menu.findItem(R.id.action_delete_selected)
+                deleteMenuItem.isVisible = count > 0
+                toolbar.title = if (count > 0) "Chosen: $count" else getString(R.string.app_name)
+            }
+        )
 
         binding.rvNotes.apply {
             adapter = noteAdapter

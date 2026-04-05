@@ -31,6 +31,12 @@ class NoteViewModel(
         }
     }
 
+    fun deleteNotes(notes: List<NoteEntity>){
+        viewModelScope.launch(Dispatchers.IO){
+            repository.deleteNotes(notes=notes)
+        }
+    }
+
     fun deleteNoteById(id: Int){
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteNoteById(id=id)
