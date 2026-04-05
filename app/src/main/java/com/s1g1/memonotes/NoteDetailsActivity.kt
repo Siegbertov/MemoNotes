@@ -14,6 +14,7 @@ import com.s1g1.memonotes.viewmodel.NoteViewModel
 import com.s1g1.memonotes.viewmodel.NoteViewModelFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -21,8 +22,14 @@ import kotlin.getValue
 
 class NoteDetailsActivity : AppCompatActivity() {
 
-    private var noteTimestamp: Long = System.currentTimeMillis()
     private var noteID: Int = -1
+
+    private var noteTimestamp: Long = System.currentTimeMillis()
+
+    private var currentNote: NoteEntity = NoteEntity(
+        timestamp = noteTimestamp
+    )
+
 
     private val noteViewModel: NoteViewModel by viewModels {
         NoteViewModelFactory((application as NoteApplication).repository)
@@ -31,7 +38,6 @@ class NoteDetailsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        noteID = intent.getIntExtra("NOTE_ID", -1)
 
         binding = ActivityNoteDetailsBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -44,7 +50,8 @@ class NoteDetailsActivity : AppCompatActivity() {
             insets
         }
 
-        setupNoteDetails()
+        updateNoteID()
+        updateNoteAndShow()
 
     }
 
@@ -59,12 +66,10 @@ class NoteDetailsActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId){
             R.id.action_save -> {
-                val result = saveNote()
-                closeEditor(result)
+                saveNote()
             }
             R.id.action_delete -> {
-                val result = removeNote()
-                closeEditor(result)
+                removeNote()
             }
         }
         return super.onOptionsItemSelected(item)
@@ -72,62 +77,73 @@ class NoteDetailsActivity : AppCompatActivity() {
 
     private fun configureNavigation() {
         binding.toolbarNoteDetails.setNavigationOnClickListener {
-            closeEditor(true)
+            closeEditor()
         }
     }
 
-    private fun setupNoteDetails() {
-        setCurrentDateTime()
-        if (noteID != -1){
-            lifecycleScope.launch(Dispatchers.IO) {
-                val currentNote = noteViewModel.getNoteById(id = noteID)
-                binding.etNoteTitle.setText(currentNote.title)
-                binding.etNoteDescription.setText(currentNote.description)
-                binding.toolbarNoteDetails.title = getString(R.string.toolbar_title_edit)
+    private fun updateNoteID(){
+        noteID = intent.getIntExtra("NOTE_ID", -1)
+    }
+
+    private fun updateNoteAndShow(){
+        if(noteID != -1){
+            lifecycleScope.launch(Dispatchers.IO){
+                val noteFromDb = noteViewModel.getNoteById(noteID)
+
+                withContext(Dispatchers.Main) {
+                    currentNote = noteFromDb
+                    updateNoteDetails()
+                }
+
             }
-        } else {
-            binding.toolbarNoteDetails.title = getString(R.string.toolbar_title_new)
         }
+    }
+
+    private fun updateNoteDetails() {
+        binding.etNoteTitle.setText(currentNote.title)
+        setCurrentDateTime()
+        binding.etNoteDescription.setText(currentNote.description)
+        binding.toolbarNoteDetails.title = if(currentNote.id!=-1) getString(R.string.toolbar_title_edit) else getString(R.string.toolbar_title_new)
+
     }
 
     private fun setCurrentDateTime(){
         val sdf = SimpleDateFormat("d MMM, HH:mm:ss", Locale.getDefault())
-        val formattedDate = sdf.format(Date(noteTimestamp))
+        val formattedDate = sdf.format(Date(currentNote.timestamp))
         binding.tvNoteDateTime.text = formattedDate
     }
 
-    private fun saveNote() : Boolean {
+    private fun saveNote() {
         val noteTitle = binding.etNoteTitle.text.toString()
         val noteDescription = binding.etNoteDescription.text.toString()
 
         if (noteTitle.isNotBlank()){
-            val newNote = NoteEntity(
-                id = if (noteID==-1) 0 else noteID,
-                title = noteTitle,
-                description = noteDescription,
-                timestamp = noteTimestamp
-            )
             lifecycleScope.launch(Dispatchers.IO){
-                noteViewModel.upsert(noteEntity=newNote)
+                noteViewModel.upsert(
+                    noteEntity=currentNote.copy(
+                        title = noteTitle,
+                        description = noteDescription
+                    )
+                )
+                withContext(Dispatchers.Main){
+                    closeEditor()
+                }
             }
-            return true
         }
-        return false
     }
 
-    private fun removeNote() : Boolean {
+    private fun removeNote() {
         if (noteID != -1){
             lifecycleScope.launch(Dispatchers.IO){
-                noteViewModel.deleteNoteById(id=noteID)
+                noteViewModel.delete(currentNote)
+                withContext(Dispatchers.Main){
+                    closeEditor()
+                }
             }
-            return true
         }
-        return false
     }
 
-    private fun closeEditor(shouldClose: Boolean) {
-        if (shouldClose){
-            finish()
-        }
+    private fun closeEditor() {
+        finish()
     }
 }
