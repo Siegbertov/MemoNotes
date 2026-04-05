@@ -1,6 +1,7 @@
 package com.s1g1.memonotes.adapters
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -37,6 +38,7 @@ class NoteAdapter(
         holder.itemView.setOnClickListener{
             if (isSelectionMode){
                 toggleSelection(note)
+                notifyDataSetChanged()
             } else {
                 onNoteClick(note)
             }
@@ -46,6 +48,7 @@ class NoteAdapter(
             if (!isSelectionMode){
                 isSelectionMode = true
                 toggleSelection(note)
+                notifyDataSetChanged()
             }
             true
         }
@@ -80,9 +83,14 @@ class NoteAdapter(
         fun bind(note: NoteEntity) {
             binding.cardTitle.text = note.title
             binding.cardDescription.text = note.description
-
             val sdf = SimpleDateFormat("d MMM, HH:mm", Locale.getDefault())
             binding.cardTimestamp.text = sdf.format(Date(note.timestamp))
+
+            binding.radioButton.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
+
+            val isSelected = selectedNotes.contains(note)
+            binding.radioButton.isChecked = isSelected
+            binding.root.isSelected = isSelected
 
             binding.root.setOnClickListener {
                 onNoteClick(note)
