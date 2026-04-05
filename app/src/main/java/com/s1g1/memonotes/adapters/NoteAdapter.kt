@@ -88,6 +88,8 @@ class NoteAdapter(
 
             binding.radioButton.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
 
+            binding.root.setCardBackgroundColor(note.bgColor.colorRes)
+
             val isSelected = selectedNotes.contains(note)
             binding.radioButton.isChecked = isSelected
             binding.root.isSelected = isSelected

@@ -11,5 +11,23 @@ data class NoteEntity(
     val id: Int = 0,
     val title: String = "",
     val description: String = "",
-    val timestamp: Long
+    val timestamp: Long,
+    val bgColor: NoteColor = NoteColor.WHITE
 )
+
+enum class NoteColor(val colorRes: Int){
+    WHITE(0xFFFFFFFF.toInt()),
+    RED(0xFFF28B82.toInt()),
+    ORANGE(0xFFFBBC04.toInt()),
+    YELLOW(0xFFFFF475.toInt()),
+    GREEN(0xFFCCFF90.toInt()),
+    BLUE(0xFFAECBFA.toInt()),
+    PURPLE(0xFFD7AEFB.toInt());
+
+    companion object {
+        fun fromName(name: String?): NoteColor =
+            entries.find { it.name == name } ?: WHITE
+    }
+}
+
+
