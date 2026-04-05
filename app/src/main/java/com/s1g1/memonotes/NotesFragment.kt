@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -79,9 +80,23 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
                 startActivity(intent)
             },
             onSelectionChanged = {count ->
+
+                val visibilityMode = count > 0
+
+                if (visibilityMode) {
+                    toolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_clear)
+
+                    toolbar.setNavigationOnClickListener {
+                        noteAdapter.clearSelection()
+                    }
+                    toolbar.title = "Chosen: $count"
+                } else {
+                    toolbar.navigationIcon = null
+                    toolbar.title = getString(R.string.app_name)
+                }
+
                 val deleteMenuItem = toolbar.menu.findItem(R.id.action_delete_selected)
-                deleteMenuItem.isVisible = count > 0
-                toolbar.title = if (count > 0) "Chosen: $count" else getString(R.string.app_name)
+                deleteMenuItem.isVisible = visibilityMode
             }
         )
 
