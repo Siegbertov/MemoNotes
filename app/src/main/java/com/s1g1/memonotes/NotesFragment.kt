@@ -47,11 +47,14 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
         setupRecyclerView()
 
         noteViewModel.allNotes.observe(viewLifecycleOwner) { notes ->
+            noteAdapter.submitList(notes)
+
             if (notes.isEmpty()) {
-                // future EMPTY IMPLEMENTATION
-                println("THERE IS NO NOTE")
+                binding.rvNotes.visibility = View.GONE
+                binding.tvEmptyView.visibility = View.VISIBLE
             } else {
-                noteAdapter.submitList(notes)
+                binding.rvNotes.visibility = View.VISIBLE
+                binding.tvEmptyView.visibility = View.GONE
             }
         }
 
