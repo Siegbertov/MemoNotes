@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
@@ -125,11 +126,11 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
                     toolbar.title = getString(R.string.app_name)
                 }
 
-                val deleteMenuItem = toolbar.menu.findItem(R.id.action_delete_selected)
-                deleteMenuItem.isVisible = visibilityMode
+                toolbar.menu.findItem(R.id.action_delete_selected).isVisible = visibilityMode
 
-                val paintMenuItem = toolbar.menu.findItem(R.id.action_paint_selected)
-                paintMenuItem.isVisible = visibilityMode
+                toolbar.menu.findItem(R.id.action_paint_selected).isVisible = visibilityMode
+
+                binding.fabAddNote.isVisible = !visibilityMode
             }
         )
 
