@@ -12,7 +12,8 @@ data class NoteEntity(
     val title: String = "",
     val description: String = "",
     val timestamp: Long,
-    val bgColor: NoteColor = NoteColor.WHITE
+    val bgColor: NoteColor = NoteColor.WHITE,
+    val pinned: Boolean = false,
 )
 
 enum class NoteColor(val colorRes: Int){
