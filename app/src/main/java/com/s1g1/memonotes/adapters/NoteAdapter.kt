@@ -87,6 +87,7 @@ class NoteAdapter(
             binding.cardTimestamp.text = sdf.format(Date(note.timestamp))
 
             binding.radioButton.visibility = if (isSelectionMode) View.VISIBLE else View.GONE
+            binding.ivPin.visibility = if (note.pinned) View.VISIBLE else View.GONE
 
             binding.root.setCardBackgroundColor(note.bgColor.colorRes)
 

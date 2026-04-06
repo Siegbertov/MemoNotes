@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/action_pin_selected"
-        android:icon="@drawable/ic_pin"
+        android:icon="@drawable/ic_pin_rotated"
         android:title="Pin"
         android:visible="false"
         app:showAsAction="ifRoom" />
