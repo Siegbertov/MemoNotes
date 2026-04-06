@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.s1g1.memonotes.database.NoteColor
 import com.s1g1.memonotes.database.NoteEntity
 import com.s1g1.memonotes.database.NoteRepository
 import kotlinx.coroutines.Dispatchers
@@ -40,6 +41,12 @@ class NoteViewModel(
     fun deleteNoteById(id: Int){
         viewModelScope.launch(Dispatchers.IO) {
             repository.deleteNoteById(id=id)
+        }
+    }
+
+    fun updateNotesColor(selectedIds: List<Int>, selectedColor: NoteColor) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateNotesColor(selectedIds=selectedIds, selectedColor=selectedColor)
         }
     }
 

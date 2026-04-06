@@ -25,4 +25,8 @@ class NoteRepository(private val noteDao: NoteEntityDao) {
     suspend fun deleteNoteById(id: Int){
         return noteDao.deleteNoteById(id=id)
     }
+
+    fun updateNotesColor(selectedIds: List<Int>, selectedColor: NoteColor) {
+        return noteDao.updateNotesColor(selectedIds=selectedIds, selectedColor=selectedColor)
+    }
 }

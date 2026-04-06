@@ -5,12 +5,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.s1g1.memonotes.adapters.ColorAdapter
 import com.s1g1.memonotes.adapters.NoteAdapter
+import com.s1g1.memonotes.database.NoteColor
 import com.s1g1.memonotes.databinding.FragmentNotesBinding
 import com.s1g1.memonotes.viewmodel.NoteViewModel
 import com.s1g1.memonotes.viewmodel.NoteViewModelFactory
@@ -37,7 +42,7 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentNotesBinding.bind(view)
-        val toolbar = requireActivity().findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar_main)
+        val toolbar = requireActivity().findViewById<MaterialToolbar>(R.id.toolbar_main)
 
         binding.fabAddNote.setOnClickListener {
             val intent = Intent(requireContext(), NoteDetailsActivity::class.java)
@@ -70,7 +75,24 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
                     true
                 }
                 R.id.action_paint_selected -> {
-                    Toast.makeText(requireContext(), "PRESSED PAINT", Toast.LENGTH_SHORT).show()
+                    val selectedNotes = noteAdapter.selectedNotes.toList()
+                    if (selectedNotes.isNotEmpty()){
+                        val dialog = BottomSheetDialog(requireContext())
+                        val view = layoutInflater.inflate(R.layout.dialog_color_picker, null)
+                        val recyclerView = view.findViewById<RecyclerView>(R.id.rv_colors)
+                        recyclerView.layoutManager = GridLayoutManager(requireContext(), 5)
+                        recyclerView.adapter = ColorAdapter(
+                            colors = NoteColor.entries.toTypedArray(),
+                            onColorSelected = { selectedColor ->
+                                val selectedIds = selectedNotes.map{it.id}
+                                noteViewModel.updateNotesColor(selectedIds, selectedColor)
+                                noteAdapter.clearSelection()
+                                dialog.dismiss()
+                            }
+                        )
+                        dialog.setContentView(view)
+                        dialog.show()
+                    }
                     true
                 }
                 else -> false
@@ -80,7 +102,7 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
     }
 
     private fun setupRecyclerView() {
-        val toolbar = requireActivity().findViewById<com.google.android.material.appbar.MaterialToolbar>(R.id.toolbar_main)
+        val toolbar = requireActivity().findViewById<MaterialToolbar>(R.id.toolbar_main)
         noteAdapter = NoteAdapter(
             onNoteClick = { note ->
                 val intent = Intent(requireContext(), NoteDetailsActivity::class.java)
