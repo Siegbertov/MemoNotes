@@ -50,6 +50,12 @@ class NoteViewModel(
         }
     }
 
+    fun changePinState(selectedIds: List<Int>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.changePinState(selectedIds=selectedIds)
+        }
+    }
+
 }
 
 

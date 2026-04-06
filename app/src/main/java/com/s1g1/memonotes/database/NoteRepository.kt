@@ -29,4 +29,8 @@ class NoteRepository(private val noteDao: NoteEntityDao) {
     fun updateNotesColor(selectedIds: List<Int>, selectedColor: NoteColor) {
         return noteDao.updateNotesColor(selectedIds=selectedIds, selectedColor=selectedColor)
     }
+
+    fun changePinState(selectedIds: List<Int>) {
+        return noteDao.changePinState(selectedIds=selectedIds)
+    }
 }

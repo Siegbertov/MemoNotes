@@ -31,4 +31,7 @@ interface NoteEntityDao {
     @Query("UPDATE $NOTE_TABLE_NAME SET bgColor=:selectedColor WHERE id IN (:selectedIds)")
     fun updateNotesColor(selectedIds: List<Int>, selectedColor: NoteColor)
 
+    @Query("UPDATE $NOTE_TABLE_NAME SET pinned=1-pinned WHERE id IN (:selectedIds)")
+    fun changePinState(selectedIds: List<Int>)
+
 }

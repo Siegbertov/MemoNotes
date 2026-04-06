@@ -99,6 +99,15 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
                     }
                     true
                 }
+                R.id.action_pin_selected -> {
+                    val selectedNotes = noteAdapter.selectedNotes.toList()
+                    if (selectedNotes.isNotEmpty()) {
+                        val selectedIds = selectedNotes.map{it.id}
+                        noteViewModel.changePinState(selectedIds)
+                        noteAdapter.clearSelection()
+                    }
+                    true
+                }
                 else -> false
             }
         }
@@ -139,6 +148,8 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
                 toolbar?.menu?.findItem(R.id.action_delete_selected)?.isVisible = visibilityMode
 
                 toolbar?.menu?.findItem(R.id.action_paint_selected)?.isVisible = visibilityMode
+
+                toolbar?.menu?.findItem(R.id.action_pin_selected)?.isVisible = visibilityMode
 
                 binding.fabAddNote.isVisible = !visibilityMode
             }
