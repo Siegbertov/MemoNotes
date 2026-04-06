@@ -3,6 +3,7 @@ package com.s1g1.memonotes
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -55,11 +56,18 @@ class NoteDetailsActivity : AppCompatActivity() {
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.note_details_menu, menu)
         if (noteID == -1) {
-            menu?.findItem(R.id.action_delete)?.isVisible = false
+            menu.findItem(R.id.action_delete)?.isVisible = false
         }
+        val brushItem = menu.findItem(R.id.action_color_picker)
+        brushItem?.icon?.let{ icon ->
+            val drawable = icon.mutate()
+            drawable.setTint(currentNote.bgColor.colorRes)
+            brushItem.icon = drawable
+        }
+
         return true
     }
 
@@ -71,8 +79,18 @@ class NoteDetailsActivity : AppCompatActivity() {
             R.id.action_delete -> {
                 removeNote()
             }
+            R.id.action_color_picker -> {
+                changeNoteColor()
+            }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    private fun changeNoteColor() {
+        val nextColor = currentNote.bgColor.getNext()
+        currentNote = currentNote.copy(bgColor = nextColor)
+        binding.root.setBackgroundColor(currentNote.bgColor.colorRes)
+        invalidateOptionsMenu()
     }
 
     private fun configureNavigation() {
@@ -97,6 +115,7 @@ class NoteDetailsActivity : AppCompatActivity() {
 
             }
         }
+        binding.root.setBackgroundColor(currentNote.bgColor.colorRes)
     }
 
     private fun updateNoteDetails() {

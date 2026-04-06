@@ -24,6 +24,11 @@ enum class NoteColor(val colorRes: Int){
     BLUE(0xFFAECBFA.toInt()),
     PURPLE(0xFFD7AEFB.toInt());
 
+
+    fun getNext(): NoteColor{
+        val nextIndex = (ordinal + 1) % entries.size
+        return entries[nextIndex]
+    }
     companion object {
         fun fromName(name: String?): NoteColor =
             entries.find { it.name == name } ?: WHITE
