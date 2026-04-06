@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -68,6 +69,10 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
                     }
                     true
                 }
+                R.id.action_paint_selected -> {
+                    Toast.makeText(requireContext(), "PRESSED PAINT", Toast.LENGTH_SHORT).show()
+                    true
+                }
                 else -> false
             }
         }
@@ -100,6 +105,9 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
 
                 val deleteMenuItem = toolbar.menu.findItem(R.id.action_delete_selected)
                 deleteMenuItem.isVisible = visibilityMode
+
+                val paintMenuItem = toolbar.menu.findItem(R.id.action_paint_selected)
+                paintMenuItem.isVisible = visibilityMode
             }
         )
 
