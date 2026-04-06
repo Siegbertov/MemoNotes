@@ -26,11 +26,11 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
     private val noteViewModel: NoteViewModel by viewModels {
         NoteViewModelFactory((requireActivity().application as NoteApplication).repository)
     }
-
     private var _binding: FragmentNotesBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var noteAdapter: NoteAdapter
+    private var toolbar: MaterialToolbar? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,16 +43,17 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentNotesBinding.bind(view)
-        val toolbar = requireActivity().findViewById<MaterialToolbar>(R.id.toolbar_main)
+        toolbar = requireActivity().findViewById(R.id.toolbar_main)
 
-        binding.fabAddNote.setOnClickListener {
-            val intent = Intent(requireContext(), NoteDetailsActivity::class.java)
-            intent.putExtra("NOTE_ID", -1)
-            startActivity(intent)
-        }
-
+        // Settings
         setupRecyclerView()
+        setupToolbarListeners()
+        setupFABListeners()
+        setupObservers()
 
+    }
+
+    private fun setupObservers(){
         noteViewModel.allNotes.observe(viewLifecycleOwner) { notes ->
             noteAdapter.submitList(notes)
 
@@ -64,14 +65,16 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
                 binding.tvEmptyView.visibility = View.GONE
             }
         }
+    }
 
-        toolbar.setOnMenuItemClickListener { item ->
+    private fun setupToolbarListeners(){
+        toolbar?.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.action_delete_selected -> {
                     val selectedNotes = noteAdapter.selectedNotes.toList()
                     if (selectedNotes.isNotEmpty()) {
                         noteViewModel.deleteNotes(selectedNotes)
-                        noteAdapter.clearSelection() // Сбрасываем выбор в UI
+                        noteAdapter.clearSelection()
                     }
                     true
                 }
@@ -102,8 +105,15 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
 
     }
 
+    private fun setupFABListeners(){
+        binding.fabAddNote.setOnClickListener {
+            val intent = Intent(requireContext(), NoteDetailsActivity::class.java)
+            intent.putExtra("NOTE_ID", -1)
+            startActivity(intent)
+        }
+    }
+
     private fun setupRecyclerView() {
-        val toolbar = requireActivity().findViewById<MaterialToolbar>(R.id.toolbar_main)
         noteAdapter = NoteAdapter(
             onNoteClick = { note ->
                 val intent = Intent(requireContext(), NoteDetailsActivity::class.java)
@@ -115,20 +125,20 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
                 val visibilityMode = count > 0
 
                 if (visibilityMode) {
-                    toolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_clear)
+                    toolbar?.navigationIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_clear)
 
-                    toolbar.setNavigationOnClickListener {
+                    toolbar?.setNavigationOnClickListener {
                         noteAdapter.clearSelection()
                     }
-                    toolbar.title = "Chosen: $count"
+                    toolbar?.title = "Chosen: $count"
                 } else {
-                    toolbar.navigationIcon = null
-                    toolbar.title = getString(R.string.app_name)
+                    toolbar?.navigationIcon = null
+                    toolbar?.title = getString(R.string.app_name)
                 }
 
-                toolbar.menu.findItem(R.id.action_delete_selected).isVisible = visibilityMode
+                toolbar?.menu?.findItem(R.id.action_delete_selected)?.isVisible = visibilityMode
 
-                toolbar.menu.findItem(R.id.action_paint_selected).isVisible = visibilityMode
+                toolbar?.menu?.findItem(R.id.action_paint_selected)?.isVisible = visibilityMode
 
                 binding.fabAddNote.isVisible = !visibilityMode
             }
@@ -143,5 +153,6 @@ class NotesFragment : Fragment(R.layout.fragment_notes){
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        toolbar = null
     }
 }
